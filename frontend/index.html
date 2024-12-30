@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>School Management</h1>
+  <form id="student-form">
+    <input type="text" id="name" placeholder="Name" required />
+    <input type="text" id="grade" placeholder="Grade" required />
+    <button type="submit">Add Student</button>
+  </form>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody id="students-table"></tbody>
+  </table>
+  <script>
+    const form = document.getElementById('student-form');
+    const tableBody = document.getElementById('students-table');
+
+    const fetchStudents = async () => {
+      const response = await fetch('/students');
+      const students = await response.json();
+      tableBody.innerHTML = students
+        .map(
+          (student) => `
+        <tr>
+          <td>${student.id}</td>
+          <td>${student.name}</td>
+          <td>${student.grade}</td>
+        </tr>`
+        )
+        .join('');
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const grade = document.getElementById('grade').value;
+
+      await fetch('/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, grade }),
+      });
+
+      form.reset();
+      fetchStudents();
+    });
+
+    fetchStudents();
+  </script>
+</body>
+</html>
